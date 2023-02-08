@@ -1,13 +1,13 @@
 //
-//  NowPlayingCellViewModel.swift
+//  MoviesCellViewModel.swift
 //  MovieApp
 //
-//  Created by esundaram esundaram on 08/02/23.
+//  Created by esundaram esundaram on 09/02/23.
 //
 
 import Foundation
 
-struct NowPlayingCellViewModel {
+struct MoviesCellViewModel {
 
     // MARK: Properties
 
@@ -20,12 +20,12 @@ struct NowPlayingCellViewModel {
     }
 
     // MARK: Presentation Properties
-    // To-do
+
     var posterImageURL: String {
         guard let posterPath = movie.posterPath else {
             return "https://critics.io/img/movies/poster-placeholder.png"
         }
-        return "https://image.tmdb.org/t/p/w154" + posterPath
+        return "https://image.tmdb.org/t/p/original" + posterPath
     }
 
     var title: String {

@@ -15,8 +15,8 @@ class NowPlayingMoviesViewController: UIViewController {
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(
-            NowPlayingCell.self,
-            forCellReuseIdentifier: String(describing: NowPlayingCell.self)
+            MoviesCell.self,
+            forCellReuseIdentifier: String(describing: MoviesCell.self)
         )
         tableView.showsVerticalScrollIndicator = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -86,13 +86,13 @@ extension NowPlayingMoviesViewController: UITableViewDelegate, UITableViewDataSo
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: String(describing: NowPlayingCell.self),
+            withIdentifier: String(describing: MoviesCell.self),
             for: indexPath
-        ) as? NowPlayingCell
+        ) as? MoviesCell
         else { return UITableViewCell() }
         
         let movie = viewModel.getMovie(at: indexPath)
-        let movieCellViewModel = NowPlayingCellViewModel(movie: movie)
+        let movieCellViewModel = MoviesCellViewModel(movie: movie)
         
         cell.selectionStyle = .none
         cell.setup(with: movieCellViewModel)

@@ -20,7 +20,7 @@ final class TopRatedMoviesService: TopRatedMoviesServiceProtocol {
 
     func getTopRatedMovies(page: Int, completion: @escaping (Result<MoviesResponse, ErrorHandler>) -> Void) {
         httpClient.request(
-            endpoint: TopRatedMoviesEndpoint.getTopRatedMovies(page: page),
+            endpoint: MoviesEndpoint.getTopRatedMovies(page: page),
             model: MoviesResponse.self,
             completion: completion
         )

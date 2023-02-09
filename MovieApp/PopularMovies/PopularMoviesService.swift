@@ -20,7 +20,7 @@ final class PopularMoviesService: PopularMoviesServiceProtocol {
 
     func getPopularMovies(page: Int, completion: @escaping (Result<MoviesResponse, ErrorHandler>) -> Void) {
         httpClient.request(
-            endpoint: PopularMoviesEndpoint.getPopularMovies(page: page),
+            endpoint: MoviesEndpoint.getPopularMovies(page: page),
             model: MoviesResponse.self,
             completion: completion
         )

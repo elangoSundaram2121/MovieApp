@@ -20,7 +20,7 @@ class MovieDetailsService: MovieDetailsServiceProtocol {
     
     func getMovie(id: Int, completion: @escaping (Result<Movie, ErrorHandler>) -> Void) {
         httpClient.request(
-            endpoint: MovieDetailsEndpoint.getMovie(id: id),
+            endpoint: MoviesEndpoint.getMovie(id: id),
             model: Movie.self,
             completion: completion
         )

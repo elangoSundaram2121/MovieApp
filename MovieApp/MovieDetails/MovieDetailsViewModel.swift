@@ -112,7 +112,20 @@ class MovieDetailsViewModel {
     }
 
     func addFavourites() {
-       
+        saveToCoreData()
+    }
+
+    func saveToCoreData() {
+        let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
+        let favouriteMovie = FavouriteMovieDetails(context: managedContext)
+        favouriteMovie.setValue(self.movie.title, forKey: #keyPath(FavouriteMovieDetails.title))
+        favouriteMovie.setValue(self.movie.overview, forKey: #keyPath(FavouriteMovieDetails.overview))
+        favouriteMovie.setValue(self.movie.runtime, forKey: #keyPath(FavouriteMovieDetails.runtime))
+        favouriteMovie.setValue(self.movie.voteAverage, forKey: #keyPath(FavouriteMovieDetails.voteAverage))
+        favouriteMovie.setValue(self.movie.releaseDate, forKey: #keyPath(FavouriteMovieDetails.releaseDate))
+        favouriteMovie.setValue(self.movie.backdropPath, forKey: #keyPath(FavouriteMovieDetails.backdropPath))
+        favouriteMovie.setValue(self.movie.posterPath, forKey: #keyPath(FavouriteMovieDetails.posterPath))
+        AppDelegate.sharedAppDelegate.coreDataStack.saveContext()
     }
 }
 

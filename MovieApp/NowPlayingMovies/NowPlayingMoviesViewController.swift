@@ -43,6 +43,7 @@ class NowPlayingMoviesViewController: UIViewController {
         configureDelegates()
         configureTitle()
         loadData()
+        configureFavouritesIconButton()
     }
     
     // MARK: Configuration/Setup
@@ -74,6 +75,14 @@ class NowPlayingMoviesViewController: UIViewController {
     
     private func loadData() {
         viewModel.loadTopRatedMovies()
+    }
+
+    private func configureFavouritesIconButton() {
+        self.navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(systemName: "heart.fill"), style: .plain, target: self, action: #selector(didTapFavButton)), animated: false)
+    }
+
+    @objc func didTapFavButton() {
+        viewModel.didSelectFavouriteIcon()
     }
 }
 

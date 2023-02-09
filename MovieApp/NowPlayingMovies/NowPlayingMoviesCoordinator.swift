@@ -11,6 +11,7 @@ import UIKit
 /// High level protocol which  represents  the set of methods and properties that the `NowPlayingMoviesCoordinator` layer must contain,
 protocol NowPlayingMoviesCoordinatorType: Coordinator {
     func goToMovieDetails(with movie: Movie)
+    func goToFavouriteMovies()
 }
 
 /// The Coordinator class to handle navigation in NowPlayingMoviesScreen of the app.
@@ -50,5 +51,12 @@ class NowPlayingMoviesCoordinator: NowPlayingMoviesCoordinatorType {
         childCoordinators.append(movieDetailsCoordinator)
         movieDetailsCoordinator.parentCoordinator = self
         movieDetailsCoordinator.start()
+    }
+
+    func goToFavouriteMovies() {
+        let favouriteMoviesCoordinator = FavouriteMoviesCoordinator(navigationController: navigationController)
+        childCoordinators.append(favouriteMoviesCoordinator)
+        favouriteMoviesCoordinator.parentCoordinator = self
+        favouriteMoviesCoordinator.start()
     }
 }

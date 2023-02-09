@@ -52,6 +52,10 @@ class NowPlayingMoviesViewModel {
         coordinator?.goToMovieDetails(with: movie)
     }
 
+    func didSelectFavouriteIcon() {
+        coordinator?.goToFavouriteMovies()
+    }
+
     // To-Do
     func setNavigationTitle() {
         delegate?.setNavigationTitle(to: "Now Playing")

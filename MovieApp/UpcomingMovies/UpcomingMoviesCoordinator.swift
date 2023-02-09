@@ -10,7 +10,7 @@ import UIKit
 
 /// High level protocol which  represents  the set of methods and properties that the `TopRatedMoviesCoordinator` layer must contain,
 public protocol UpcomingMoviesCoordinatorType: Coordinator {
-
+    
 }
 
 /// The Coordinator class to handle navigation in UpcomingMoviesScreen of the app.

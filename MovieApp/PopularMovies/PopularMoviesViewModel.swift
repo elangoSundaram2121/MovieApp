@@ -47,7 +47,8 @@ class PopularMoviesViewModel {
     }
 
     func didSelectItem(at indexPath: IndexPath) {
-
+        let movie = getMovie(at: indexPath)
+        coordinator?.goToMovieDetails(with: movie)
     }
 
     // To-do

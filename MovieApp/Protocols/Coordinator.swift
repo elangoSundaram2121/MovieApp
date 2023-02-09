@@ -34,10 +34,14 @@ public protocol Coordinator: AnyObject {
      -Important: For Example, **CoordinatorA** is the coordinator for **Screen A**, so when start is called on **CoordinatorA**, the **CoordinatorA** will create the **Screen A** instance and adds to navigation stack and displays the **Screen A**
      */
     func start()
+
+    func finish()
 }
 
 public extension Coordinator {
 
-
+    func finish() {
+        parentCoordinator?.childCoordinators.removeAll { $0 === self }
+    }
 
 }

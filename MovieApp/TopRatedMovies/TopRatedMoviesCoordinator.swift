@@ -9,13 +9,13 @@ import Foundation
 import UIKit
 
 /// High level protocol which  represents  the set of methods and properties that the `TopRatedMoviesCoordinator` layer must contain,
-public protocol TopRatedMoviesCoordinatorType: Coordinator {
-
+protocol TopRatedMoviesCoordinatorType: Coordinator {
+    func goToMovieDetails(with movie: Movie)
 }
 
 /// The Coordinator class to handle navigation in TopRatedMoviesMoviesScreen of the app.
 /// Also confirms to `TopRatedMoviesCoordinatorType`
-public class TopRatedMoviesCoordinator: TopRatedMoviesCoordinatorType {
+class TopRatedMoviesCoordinator: TopRatedMoviesCoordinatorType {
 
     // MARK: - Coordinator's Properties
     public var childCoordinators: [Coordinator] = []
@@ -41,5 +41,15 @@ public class TopRatedMoviesCoordinator: TopRatedMoviesCoordinatorType {
     public func start() {
         navigationController.pushViewController(makeViewController(), animated: false)
 
+    }
+
+    func goToMovieDetails(with movie: Movie) {
+        let movieDetailsCoordinator = MovieDetailsCoordinator(
+            navigationController: navigationController,
+            movie: movie
+        )
+        childCoordinators.append(movieDetailsCoordinator)
+        movieDetailsCoordinator.parentCoordinator = self
+        movieDetailsCoordinator.start()
     }
 }

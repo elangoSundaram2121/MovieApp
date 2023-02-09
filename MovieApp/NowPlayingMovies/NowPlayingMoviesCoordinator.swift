@@ -9,13 +9,13 @@ import Foundation
 import UIKit
 
 /// High level protocol which  represents  the set of methods and properties that the `NowPlayingMoviesCoordinator` layer must contain,
-public protocol NowPlayingMoviesCoordinatorType: Coordinator {
-
+protocol NowPlayingMoviesCoordinatorType: Coordinator {
+    func goToMovieDetails(with movie: Movie)
 }
 
 /// The Coordinator class to handle navigation in NowPlayingMoviesScreen of the app.
 /// Also confirms to `NowPlayingMoviesCoordinatorType`
-public class NowPlayingMoviesCoordinator: NowPlayingMoviesCoordinatorType {
+class NowPlayingMoviesCoordinator: NowPlayingMoviesCoordinatorType {
 
     // MARK: - Coordinator's Properties
     public var childCoordinators: [Coordinator] = []
@@ -40,5 +40,15 @@ public class NowPlayingMoviesCoordinator: NowPlayingMoviesCoordinatorType {
     public func start() {
         navigationController.pushViewController(makeViewController(), animated: false)
 
+    }
+
+    func goToMovieDetails(with movie: Movie) {
+        let movieDetailsCoordinator = MovieDetailsCoordinator(
+            navigationController: navigationController,
+            movie: movie
+        )
+        childCoordinators.append(movieDetailsCoordinator)
+        movieDetailsCoordinator.parentCoordinator = self
+        movieDetailsCoordinator.start()
     }
 }

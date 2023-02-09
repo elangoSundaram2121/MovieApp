@@ -48,9 +48,9 @@ class TopRatedMoviesViewModel {
         return movies.count
     }
 
-    // To-Do
     func didSelectRow(at indexPath: IndexPath) {
-
+        let movie = getMovie(at: indexPath)
+        coordinator?.goToMovieDetails(with: movie)
     }
 
     // To-Do

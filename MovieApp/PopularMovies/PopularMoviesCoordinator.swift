@@ -9,13 +9,13 @@ import Foundation
 import UIKit
 
 /// High level protocol which  represents  the set of methods and properties that the `PopularMoviesCoordinator` layer must contain,
-public protocol PopularMoviesCoordinatorType: Coordinator {
-
+protocol PopularMoviesCoordinatorType: Coordinator {
+    func goToMovieDetails(with movie: Movie)
 }
 
 /// The Coordinator class to handle navigation in PopularMoviesScreen of the app.
 /// Also confirms to `PopularMoviesCoordinatorType`
-public class PopularMoviesCoordinator: PopularMoviesCoordinatorType {
+class PopularMoviesCoordinator: PopularMoviesCoordinatorType {
 
     // MARK: - Coordinator's Properties
     
@@ -42,5 +42,15 @@ public class PopularMoviesCoordinator: PopularMoviesCoordinatorType {
     public func start() {
         navigationController.pushViewController(makeViewController(), animated: false)
 
+    }
+
+    func goToMovieDetails(with movie: Movie) {
+        let movieDetailsCoordinator = MovieDetailsCoordinator(
+            navigationController: navigationController,
+            movie: movie
+        )
+        childCoordinators.append(movieDetailsCoordinator)
+        movieDetailsCoordinator.parentCoordinator = self
+        movieDetailsCoordinator.start()
     }
 }

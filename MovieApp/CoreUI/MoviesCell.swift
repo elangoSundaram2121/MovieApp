@@ -37,7 +37,7 @@ class MoviesCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = UIImage(systemName: "star.fill")
-        imageView.tintColor = UIColor(named: "AccentColor")
+        imageView.tintColor = .black
         return imageView
     }()
     

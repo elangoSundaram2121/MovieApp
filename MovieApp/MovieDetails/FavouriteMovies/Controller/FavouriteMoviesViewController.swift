@@ -27,6 +27,18 @@ class FavouriteMoviesViewController: UIViewController {
         return tableView
     }()
 
+    private let closeButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "xmark"), for: .normal)
+        button.tintColor = .black
+        button.backgroundColor = UIColor(white: 0.25, alpha: 1)
+        button.layer.cornerRadius = 15
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+
+    
+
     // MARK: Initialization
 
     init(coordinator: FavouriteMoviesCoordinatorType) {
@@ -46,6 +58,7 @@ class FavouriteMoviesViewController: UIViewController {
         configureConstraints()
         configureDelegates()
         configureTitle()
+        configureButton()
         loadData()
     }
 
@@ -53,15 +66,26 @@ class FavouriteMoviesViewController: UIViewController {
 
     private func configureViews() {
         view.addSubview(tableView)
+        view.addSubview(closeButton)
     }
 
     private func configureConstraints() {
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+
+            closeButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 15),
+            closeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -25),
+            closeButton.widthAnchor.constraint(equalToConstant: 30),
+            closeButton.heightAnchor.constraint(equalToConstant: 30),
+
+            tableView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 20),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+    }
+
+    private func configureButton() {
+        closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
     }
 
     private func configureDelegates() {
@@ -71,6 +95,10 @@ class FavouriteMoviesViewController: UIViewController {
 
     private func configureTitle() {
 
+    }
+
+    @objc private func didTapClose() {
+        self.coordinator.dismissFavouriteMovies()
     }
 
     // MARK: Data Manipulation Methods

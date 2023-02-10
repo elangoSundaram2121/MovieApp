@@ -38,5 +38,7 @@ struct FavouriteMoviesCellViewModel {
     var rating: String {
         return String(movie.voteAverage)
     }
+
+    
 }
 

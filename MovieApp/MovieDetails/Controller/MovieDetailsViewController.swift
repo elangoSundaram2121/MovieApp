@@ -11,6 +11,8 @@ final class MovieDetailsViewController: UIViewController {
     // MARK: Properties
     
     private let viewModel: MovieDetailsViewModel
+
+    var isAddToFavouritesButtonClicked = false
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -70,17 +72,25 @@ final class MovieDetailsViewController: UIViewController {
         button.layer.cornerRadius = 5
         return button
     }()
-    
+
+    private let goTofavouritesButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.layer.cornerRadius = 5
+        return button
+    }()
+
     private let closeButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "xmark"), for: .normal)
-        button.tintColor = UIColor(named: "AccentColor")
+        button.tintColor = .black
         button.backgroundColor = UIColor(white: 0.25, alpha: 1)
         button.layer.cornerRadius = 15
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
+
     // MARK: Initialization
     
     init(viewModel: MovieDetailsViewModel) {
@@ -115,32 +125,47 @@ final class MovieDetailsViewController: UIViewController {
         view.addSubview(scrollView)
         
         scrollView.addSubview(imgView)
-        scrollView.addSubview(closeButton)
         scrollView.addSubview(titleLabel)
         scrollView.addSubview(subtitleLabel)
         scrollView.addSubview(overviewLabel)
         scrollView.addSubview(ratingLabel)
         scrollView.addSubview(scoreLabel)
         scrollView.addSubview(addToFavoritesButton)
+        scrollView.addSubview(goTofavouritesButton)
+        scrollView.addSubview(closeButton)
     }
     
     private func configureButton() {
+
         closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
 
-
-        addToFavoritesButton.setTitle("Add to favorites", for: .normal)
+        addToFavoritesButton.setTitle("Add to favourites", for: .normal)
         addToFavoritesButton.setTitleColor(.white, for: .normal)
         addToFavoritesButton.backgroundColor = .black
 
         addToFavoritesButton.addTarget(self, action: #selector(didTapAddToFavourites), for: .touchUpInside)
-    }
-    
-    @objc private func didTapClose() {
-        viewModel.didFinishShowDetails()
+
+        goTofavouritesButton.setTitle("Go to favourites", for: .normal)
+        goTofavouritesButton.setTitleColor(.white, for: .normal)
+        goTofavouritesButton.backgroundColor = .black
+
+        goTofavouritesButton.addTarget(self, action: #selector(didTapGoToFavourites), for: .touchUpInside)
     }
 
     @objc private func didTapAddToFavourites() {
+        self.isAddToFavouritesButtonClicked = !self.isAddToFavouritesButtonClicked
+        addToFavoritesButton.setTitle(self.isAddToFavouritesButtonClicked ? "Added to Favourites" : "Add to Favourites", for: .normal)
+        self.addToFavoritesButton.isUserInteractionEnabled = false
         viewModel.addFavourites()
+    }
+
+    @objc private func didTapGoToFavourites() {
+
+        viewModel.didTapFavourites()
+    }
+
+    @objc private func didTapClose() {
+        viewModel.didFinishShowDetails()
     }
     
     private func configureConstraints() {
@@ -161,7 +186,7 @@ final class MovieDetailsViewController: UIViewController {
             imgView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             imgView.heightAnchor.constraint(equalToConstant: imageHeight),
             imgView.widthAnchor.constraint(equalToConstant: imageWidth),
-            
+
             closeButton.topAnchor.constraint(equalTo: imgView.topAnchor, constant: padding),
             closeButton.trailingAnchor.constraint(equalTo: imgView.trailingAnchor, constant: -padding),
             closeButton.widthAnchor.constraint(equalToConstant: buttonSize),
@@ -188,7 +213,11 @@ final class MovieDetailsViewController: UIViewController {
 
             addToFavoritesButton.leadingAnchor.constraint(equalTo: ratingLabel.leadingAnchor),
             addToFavoritesButton.topAnchor.constraint(equalTo: ratingLabel.bottomAnchor, constant: padding),
-            addToFavoritesButton.trailingAnchor.constraint(equalTo: overviewLabel.trailingAnchor, constant: -padding)
+            addToFavoritesButton.trailingAnchor.constraint(equalTo: overviewLabel.trailingAnchor, constant: -padding),
+
+            goTofavouritesButton.leadingAnchor.constraint(equalTo: addToFavoritesButton.leadingAnchor),
+            goTofavouritesButton.topAnchor.constraint(equalTo: addToFavoritesButton.bottomAnchor, constant: padding),
+            goTofavouritesButton.trailingAnchor.constraint(equalTo: overviewLabel.trailingAnchor, constant: -padding)
 
         ])
     }

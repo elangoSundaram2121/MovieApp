@@ -19,7 +19,7 @@ final class HTTPClient: HTTPClientProtocol {
             completion(.failure(.invalidURL))
             return
         }
-
+        print(url)
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = endpoint.header
         request.httpMethod = endpoint.method.rawValue

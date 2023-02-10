@@ -9,6 +9,7 @@ import UIKit
 
 protocol MovieDetailsCoordinatorType: Coordinator {
     func dismissMovieDetails()
+    func goToFavourites()
 }
 
 final class MovieDetailsCoordinator: MovieDetailsCoordinatorType {
@@ -40,5 +41,13 @@ final class MovieDetailsCoordinator: MovieDetailsCoordinatorType {
     func dismissMovieDetails() {
         navigationController.dismiss(animated: true)
         finish()
+    }
+
+    func goToFavourites() {
+        self.dismissMovieDetails()
+        let favouritesMovieCoordinator = FavouriteMoviesCoordinator(navigationController: navigationController)
+        childCoordinators.append(favouritesMovieCoordinator)
+        favouritesMovieCoordinator.parentCoordinator = self
+        favouritesMovieCoordinator.start()
     }
 }

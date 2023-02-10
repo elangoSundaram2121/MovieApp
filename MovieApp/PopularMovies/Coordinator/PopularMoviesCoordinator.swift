@@ -1,5 +1,5 @@
 //
-//  UpcomingMoviesCoordinator.swift
+//  PopularMoviesCoordinator.swift
 //  MovieApp
 //
 //  Created by esundaram esundaram on 08/02/23.
@@ -8,35 +8,37 @@
 import Foundation
 import UIKit
 
-/// High level protocol which  represents  the set of methods and properties that the `UpcomingMoviesCoordinator` layer must contain,
-protocol UpcomingMoviesCoordinatorType: Coordinator {
+/// High level protocol which  represents  the set of methods and properties that the `PopularMoviesCoordinator` layer must contain,
+protocol PopularMoviesCoordinatorType: Coordinator {
     func goToMovieDetails(with movie: Movie)
 }
 
-/// The Coordinator class to handle navigation in UpcomingMoviesScreen of the app.
-/// Also confirms to `UpcomingMoviesCoordinatorType`
-class UpcomingMoviesCoordinator: UpcomingMoviesCoordinatorType {
+/// The Coordinator class to handle navigation in PopularMoviesScreen of the app.
+/// Also confirms to `PopularMoviesCoordinatorType`
+class PopularMoviesCoordinator: PopularMoviesCoordinatorType {
 
     // MARK: - Coordinator's Properties
-
+    
     public var childCoordinators: [Coordinator] = []
 
     public var parentCoordinator: Coordinator?
 
     private let navigationController: UINavigationController = .init()
 
-    // MARK: Helpers
-
+    // MARK: - Helpers
+    
     var rootViewController: UIViewController {
-        navigationController.tabBarItem = UITabBarItem(title: "Upcoming", image: UIImage(systemName: "seal"), selectedImage: UIImage(systemName: "seal.fill"))
+        navigationController.tabBarItem = UITabBarItem(title: "Popular", image: UIImage(systemName: "film"),
+                                                       selectedImage: UIImage(systemName: "film.fill"))
         navigationController.navigationBar.prefersLargeTitles = true
+        navigationController.navigationBar.tintColor = .black
         return navigationController
     }
-    
-    private func makeViewController() -> UpcomingMoviesViewController {
-        let viewModel = UpcomingMoviesViewModel()
+
+    private func makeViewController() -> PopularMoviesViewController {
+        let viewModel = PopularMoviesViewModel()
         viewModel.coordinator = self
-        return UpcomingMoviesViewController(viewModel: viewModel)
+        return PopularMoviesViewController(viewModel: viewModel)
     }
 
     public func start() {

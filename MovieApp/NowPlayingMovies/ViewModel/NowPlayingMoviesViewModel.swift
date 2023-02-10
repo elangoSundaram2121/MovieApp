@@ -12,6 +12,7 @@ protocol NowPlayingMoviesViewModelDelegate: AnyObject {
     func showLoading()
     func hideLoading()
     func reloadData()
+    func reloadSearchData()
     func didFail(with error: ErrorHandler)
     func setNavigationTitle(to value: String)
 }
@@ -21,8 +22,10 @@ class NowPlayingMoviesViewModel {
 
     // MARK: - Properties
     private let service: NowPlayingMoviesServiceProtocol
+    private let searchService: SearchMoviesServiceProtocol
 
     private var movies: [Movie] = []
+    private var searchResults: [Movie] = []
     private var currentPage: Int = 1
     private var isLoading = false
 
@@ -32,15 +35,21 @@ class NowPlayingMoviesViewModel {
     // MARK: - Initialization
 
     init(
-        service: NowPlayingMoviesServiceProtocol = NowPlayingMoviesService()
+        service: NowPlayingMoviesServiceProtocol = NowPlayingMoviesService(),
+        searchService: SearchMoviesServiceProtocol = SearchMoviesService()
     ) {
         self.service = service
+        self.searchService = searchService
     }
 
     // MARK: Methods
 
     func getMovie(at indexPath: IndexPath) -> Movie {
         return movies[indexPath.row]
+    }
+
+    func getSearchResultsMovie(at indexPath: IndexPath) -> Movie {
+        return searchResults[indexPath.row]
     }
 
     func numberOfRows() -> Int {
@@ -58,13 +67,15 @@ class NowPlayingMoviesViewModel {
 
     // To-Do
     func setNavigationTitle() {
-        delegate?.setNavigationTitle(to: "Now Playing")
+       
     }
 
     func loadTopRatedMovies() {
         delegate?.showLoading()
         getNowPlayingMovies()
     }
+
+    
 
     func userRequestedMoreData() {
         if !isLoading {
@@ -73,7 +84,7 @@ class NowPlayingMoviesViewModel {
         }
     }
 
-    private func getNowPlayingMovies() {
+    func getNowPlayingMovies() {
         isLoading = true
         service.getNowPlayingMovies(page: currentPage) { [weak self] result in
             switch result {
@@ -87,6 +98,22 @@ class NowPlayingMoviesViewModel {
             self?.isLoading = false
             self?.delegate?.hideLoading()
         }
+    }
+
+    func searchMovies(with query: String) {
+
+        searchService.searchMovie(query: query, page: currentPage) { [weak self] result in
+                switch result {
+                case .success(let movies):
+                    self?.searchResults = movies.results
+                    self?.delegate?.reloadSearchData()
+
+                case .failure(let error):
+                    self?.delegate?.didFail(with: error)
+                }
+                self?.delegate?.hideLoading()
+            }
+
     }
 
 }

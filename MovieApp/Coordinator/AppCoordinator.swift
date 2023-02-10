@@ -25,6 +25,7 @@ final class AppCoordinator: Coordinator {
         if #available(iOS 15.0, *) {
             tabBarController.tabBar.scrollEdgeAppearance = tabBarAppearance
         }
+        tabBarController.tabBar.tintColor = .black
         return tabBarController
     }()
     

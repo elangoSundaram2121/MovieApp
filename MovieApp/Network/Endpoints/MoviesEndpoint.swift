@@ -13,6 +13,7 @@ enum MoviesEndpoint {
     case getNowPlayingMovies(page: Int)
     case getUpcomingMovies(page: Int)
     case getMovie(id: Int)
+    case searchMovie(query: String, page: Int)
 }
 
 extension MoviesEndpoint: Endpoint {
@@ -28,12 +29,14 @@ extension MoviesEndpoint: Endpoint {
             return "/movie/upcoming"
         case .getMovie(let id):
             return "/movie/\(id)"
+        case .searchMovie:
+            return "/search/movie"
         }
     }
 
     var method: HTTPMethod {
         switch self {
-        case .getTopRatedMovies, .getUpcomingMovies, .getPopularMovies, .getNowPlayingMovies, .getMovie:
+        case .getTopRatedMovies, .getUpcomingMovies, .getPopularMovies, .getNowPlayingMovies, .getMovie, .searchMovie:
             return .get
         }
     }
@@ -47,6 +50,12 @@ extension MoviesEndpoint: Endpoint {
             ]
         case .getMovie:
             return [
+                URLQueryItem(name: "api_key", value: "0e7274f05c36db12cbe71d9ab0393d47")
+            ]
+        case .searchMovie(let query, let page):
+            return [
+                URLQueryItem(name: "query", value: query),
+                URLQueryItem(name: "page", value: "\(page)"),
                 URLQueryItem(name: "api_key", value: "0e7274f05c36db12cbe71d9ab0393d47")
             ]
         }

@@ -111,6 +111,11 @@ class MovieDetailsViewModel {
         coordinator?.dismissMovieDetails()
     }
 
+    func didTapFavourites() {
+        coordinator?.goToFavourites()
+        
+    }
+
     func addFavourites() {
         saveToCoreData()
     }

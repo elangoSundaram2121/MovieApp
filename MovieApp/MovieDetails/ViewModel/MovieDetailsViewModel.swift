@@ -9,6 +9,7 @@ import Foundation
 import CoreData
 import UIKit
 
+
 protocol MovieDetailsViewModelDelegate: AnyObject {
     func showLoading()
     func hideLoading()
@@ -17,10 +18,12 @@ protocol MovieDetailsViewModelDelegate: AnyObject {
 }
 
 class MovieDetailsViewModel {
+    
     // MARK: Properties
     
-    private var movie: Movie
+    var movie: Movie
     private var service: MovieDetailsServiceProtocol
+    var favouriteMovies: [FavouriteMovieDetails] = []
     
     weak var delegate: MovieDetailsViewModelDelegate?
     weak var coordinator: MovieDetailsCoordinatorType?
@@ -107,19 +110,33 @@ class MovieDetailsViewModel {
         }
     }
     
+    func getFavouriteMovies() {
+        let movieFetch: NSFetchRequest<FavouriteMovieDetails> = FavouriteMovieDetails.fetchRequest()
+        
+        do {
+            let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
+            let results = try managedContext.fetch(movieFetch)
+            favouriteMovies = results
+        } catch let error as NSError {
+            print("Fetch error: \(error) description: \(error.userInfo)")
+        }
+    }
+    
     func didFinishShowDetails() {
         coordinator?.dismissMovieDetails()
     }
-
+    
     func didTapFavourites() {
         coordinator?.goToFavourites()
         
     }
-
+    
+    
     func addFavourites() {
         saveToCoreData()
     }
-
+    
+    // Saving Movie data using CoreData
     func saveToCoreData() {
         let managedContext = AppDelegate.sharedAppDelegate.coreDataStack.managedContext
         let favouriteMovie = FavouriteMovieDetails(context: managedContext)

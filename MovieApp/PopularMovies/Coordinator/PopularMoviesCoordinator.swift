@@ -30,7 +30,6 @@ class PopularMoviesCoordinator: PopularMoviesCoordinatorType {
     var rootViewController: UIViewController {
         navigationController.tabBarItem = UITabBarItem(title: "Popular", image: UIImage(systemName: "film"),
                                                        selectedImage: UIImage(systemName: "film.fill"))
-        navigationController.navigationBar.prefersLargeTitles = true
         navigationController.navigationBar.tintColor = .black
         return navigationController
     }

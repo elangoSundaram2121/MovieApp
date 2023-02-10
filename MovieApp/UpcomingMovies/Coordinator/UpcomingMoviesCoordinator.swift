@@ -16,21 +16,20 @@ protocol UpcomingMoviesCoordinatorType: Coordinator {
 /// The Coordinator class to handle navigation in UpcomingMoviesScreen of the app.
 /// Also confirms to `UpcomingMoviesCoordinatorType`
 class UpcomingMoviesCoordinator: UpcomingMoviesCoordinatorType {
-
+    
     // MARK: - Coordinator's Properties
-
+    
     public var childCoordinators: [Coordinator] = []
-
+    
     public var parentCoordinator: Coordinator?
-
+    
     private let navigationController: UINavigationController = .init()
-
+    
     // MARK: Helpers
-
+    
     var rootViewController: UIViewController {
         navigationController.tabBarItem = UITabBarItem(title: "Upcoming", image: UIImage(systemName: "arrow.rectanglepath"),
                                                        selectedImage: UIImage(systemName: "arrow.rectanglepath.fill"))
-        navigationController.navigationBar.prefersLargeTitles = true
         navigationController.navigationBar.tintColor = .black
         return navigationController
     }
@@ -40,12 +39,12 @@ class UpcomingMoviesCoordinator: UpcomingMoviesCoordinatorType {
         viewModel.coordinator = self
         return UpcomingMoviesViewController(viewModel: viewModel)
     }
-
+    
     public func start() {
         navigationController.pushViewController(makeViewController(), animated: false)
-
+        
     }
-
+    
     func goToMovieDetails(with movie: Movie) {
         let movieDetailsCoordinator = MovieDetailsCoordinator(
             navigationController: navigationController,

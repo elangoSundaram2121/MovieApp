@@ -13,11 +13,11 @@ protocol UpcomingMoviesServiceProtocol {
 
 final class UpcomingMoviesService: UpcomingMoviesServiceProtocol {
     private let httpClient: HTTPClientProtocol
-
+    
     init(httpClient: HTTPClientProtocol = HTTPClient.shared) {
         self.httpClient = httpClient
     }
-
+    
     func getUpcomingMovies(page: Int, completion: @escaping (Result<MoviesResponse, ErrorHandler>) -> Void) {
         httpClient.request(
             endpoint: MoviesEndpoint.getUpcomingMovies(page: page),

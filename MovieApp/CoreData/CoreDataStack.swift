@@ -7,6 +7,7 @@
 
 import CoreData
 
+
 class CoreDataStack {
     private let modelName: String
 
@@ -26,6 +27,7 @@ class CoreDataStack {
 
     lazy var managedContext: NSManagedObjectContext = self.storeContainer.viewContext
 
+    // Method to Save data in CoreData
     func saveContext() {
         guard managedContext.hasChanges else { return }
         do {

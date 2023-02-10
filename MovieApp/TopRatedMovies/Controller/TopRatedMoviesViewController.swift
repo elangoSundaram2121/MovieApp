@@ -10,8 +10,8 @@ import UIKit
 class TopRatedMoviesViewController: UIViewController {
 
     // MARK: Properties
-
     private let viewModel: TopRatedMoviesViewModel
+
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(
@@ -114,7 +114,6 @@ extension TopRatedMoviesViewController: UITableViewDelegate, UITableViewDataSour
 }
 
 // MARK: NowPlayingMoviesViewModelDelegate Methods
-
 extension TopRatedMoviesViewController: TopRatedMoviesViewModelDelegate, Loadable, Alertable {
     func showLoading() {
         DispatchQueue.main.async { [weak self] in
@@ -160,7 +159,6 @@ extension TopRatedMoviesViewController: TopRatedMoviesViewModelDelegate, Loadabl
 }
 
 // MARK: TableViewFooter Private Extension Methods
-
 private extension TopRatedMoviesViewController {
     private func createFooterSpinner(on tableView: UITableView) -> UIActivityIndicatorView {
         let spinner = UIActivityIndicatorView(style: .medium)

@@ -13,11 +13,11 @@ protocol TopRatedMoviesServiceProtocol {
 
 final class TopRatedMoviesService: TopRatedMoviesServiceProtocol {
     private let httpClient: HTTPClientProtocol
-
+    
     init(httpClient: HTTPClientProtocol = HTTPClient.shared) {
         self.httpClient = httpClient
     }
-
+    
     func getTopRatedMovies(page: Int, completion: @escaping (Result<MoviesResponse, ErrorHandler>) -> Void) {
         httpClient.request(
             endpoint: MoviesEndpoint.getTopRatedMovies(page: page),

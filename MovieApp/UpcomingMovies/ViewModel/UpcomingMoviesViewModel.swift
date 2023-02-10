@@ -18,57 +18,56 @@ protocol UpcomingMoviesViewModelDelegate: AnyObject {
 
 /// The `ViewModel` that controls NowPlayingMovies UI
 class UpcomingMoviesViewModel {
-
+    
     // MARK: - Properties
     private let service: UpcomingMoviesServiceProtocol
-
+    
     private var movies: [Movie] = []
     private var currentPage: Int = 1
     private var isLoading = false
-
+    
     weak var delegate: UpcomingMoviesViewModelDelegate?
     weak var coordinator: UpcomingMoviesCoordinatorType?
-
+    
     // MARK: - Initialization
-
+    
     init(
         service: UpcomingMoviesServiceProtocol = UpcomingMoviesService()
     ) {
         self.service = service
     }
-
+    
     // MARK: Methods
-
+    
     func getMovie(at indexPath: IndexPath) -> Movie {
         return movies[indexPath.row]
     }
-
+    
     func numberOfRows() -> Int {
         return movies.count
     }
-
+    
     func didSelectRow(at indexPath: IndexPath) {
         let movie = getMovie(at: indexPath)
         coordinator?.goToMovieDetails(with: movie)
     }
-
-    // To-Do
+    
     func setNavigationTitle() {
         delegate?.setNavigationTitle(to: "Upcoming")
     }
-
-    func loadTopRatedMovies() {
+    
+    func loadUpcomingMovies() {
         delegate?.showLoading()
         getUpcomingMovies()
     }
-
+    
     func userRequestedMoreData() {
         if !isLoading {
             delegate?.showPaginationLoading()
             getUpcomingMovies()
         }
     }
-
+    
     private func getUpcomingMovies() {
         isLoading = true
         service.getUpcomingMovies(page: currentPage) { [weak self] result in
@@ -84,6 +83,5 @@ class UpcomingMoviesViewModel {
             self?.delegate?.hideLoading()
         }
     }
-
 }
 

@@ -8,11 +8,13 @@
 import UIKit
 
 final class MovieDetailsViewController: UIViewController {
+    
     // MARK: Properties
     
     private let viewModel: MovieDetailsViewModel
-
+    
     var isAddToFavouritesButtonClicked = false
+    
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -64,7 +66,7 @@ final class MovieDetailsViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 16)
         return label
     }()
-
+    
     private let addToFavoritesButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -72,7 +74,7 @@ final class MovieDetailsViewController: UIViewController {
         button.layer.cornerRadius = 5
         return button
     }()
-
+    
     private let goTofavouritesButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -80,7 +82,7 @@ final class MovieDetailsViewController: UIViewController {
         button.layer.cornerRadius = 5
         return button
     }()
-
+    
     private let closeButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "xmark"), for: .normal)
@@ -90,7 +92,7 @@ final class MovieDetailsViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-
+    
     // MARK: Initialization
     
     init(viewModel: MovieDetailsViewModel) {
@@ -108,9 +110,11 @@ final class MovieDetailsViewController: UIViewController {
         super.viewDidLoad()
         configureViews()
         configureButton()
+        loadData()
+        configureFavouriteButton()
         configureConstraints()
         configureDelegates()
-        loadData()
+        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -136,37 +140,36 @@ final class MovieDetailsViewController: UIViewController {
     }
     
     private func configureButton() {
-
+        
         closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
-
-        addToFavoritesButton.setTitle("Add to favourites", for: .normal)
-        addToFavoritesButton.setTitleColor(.white, for: .normal)
+        
         addToFavoritesButton.backgroundColor = .black
-
         addToFavoritesButton.addTarget(self, action: #selector(didTapAddToFavourites), for: .touchUpInside)
-
+        
         goTofavouritesButton.setTitle("Go to favourites", for: .normal)
         goTofavouritesButton.setTitleColor(.white, for: .normal)
         goTofavouritesButton.backgroundColor = .black
-
         goTofavouritesButton.addTarget(self, action: #selector(didTapGoToFavourites), for: .touchUpInside)
     }
-
+    
+    func configureFavouriteButton() {
+        viewModel.favouriteMovies.forEach { favourite in
+            if favourite.title == viewModel.movie.title {
+                self.isAddToFavouritesButtonClicked.toggle()
+            }
+        }
+        addToFavoritesButton.setTitle(self.isAddToFavouritesButtonClicked ? "Added to Favourites" : "Add to Favourites", for: .normal)
+        self.addToFavoritesButton.isUserInteractionEnabled = self.isAddToFavouritesButtonClicked ? false : true
+        addToFavoritesButton.setTitleColor(.white, for: .normal)
+    }
+    
     @objc private func didTapAddToFavourites() {
         self.isAddToFavouritesButtonClicked = !self.isAddToFavouritesButtonClicked
-        addToFavoritesButton.setTitle(self.isAddToFavouritesButtonClicked ? "Added to Favourites" : "Add to Favourites", for: .normal)
-        self.addToFavoritesButton.isUserInteractionEnabled = false
+        self.configureFavouriteButton()
         viewModel.addFavourites()
     }
-
-    @objc private func didTapGoToFavourites() {
-
-        viewModel.didTapFavourites()
-    }
-
-    @objc private func didTapClose() {
-        viewModel.didFinishShowDetails()
-    }
+    
+    
     
     private func configureConstraints() {
         let aspectRatio: CGFloat = 16 / 9  // The background image has 16:9 dimension
@@ -186,7 +189,7 @@ final class MovieDetailsViewController: UIViewController {
             imgView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             imgView.heightAnchor.constraint(equalToConstant: imageHeight),
             imgView.widthAnchor.constraint(equalToConstant: imageWidth),
-
+            
             closeButton.topAnchor.constraint(equalTo: imgView.topAnchor, constant: padding),
             closeButton.trailingAnchor.constraint(equalTo: imgView.trailingAnchor, constant: -padding),
             closeButton.widthAnchor.constraint(equalToConstant: buttonSize),
@@ -210,15 +213,15 @@ final class MovieDetailsViewController: UIViewController {
             scoreLabel.leadingAnchor.constraint(equalTo: ratingLabel.trailingAnchor, constant: padding),
             scoreLabel.topAnchor.constraint(equalTo: ratingLabel.topAnchor),
             scoreLabel.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -padding),
-
+            
             addToFavoritesButton.leadingAnchor.constraint(equalTo: ratingLabel.leadingAnchor),
             addToFavoritesButton.topAnchor.constraint(equalTo: ratingLabel.bottomAnchor, constant: padding),
             addToFavoritesButton.trailingAnchor.constraint(equalTo: overviewLabel.trailingAnchor, constant: -padding),
-
+            
             goTofavouritesButton.leadingAnchor.constraint(equalTo: addToFavoritesButton.leadingAnchor),
             goTofavouritesButton.topAnchor.constraint(equalTo: addToFavoritesButton.bottomAnchor, constant: padding),
             goTofavouritesButton.trailingAnchor.constraint(equalTo: overviewLabel.trailingAnchor, constant: -padding)
-
+            
         ])
     }
     
@@ -226,10 +229,20 @@ final class MovieDetailsViewController: UIViewController {
         viewModel.delegate = self
     }
     
-    // MARK: Data Manipulation Methods
+    // MARK: - Action methods
+    @objc private func didTapGoToFavourites() {
+        
+        viewModel.didTapFavourites()
+    }
     
+    @objc private func didTapClose() {
+        viewModel.didFinishShowDetails()
+    }
+    
+    // MARK: Data Manipulation Methods
     private func loadData() {
         viewModel.getMovie()
+        viewModel.getFavouriteMovies()
     }
 }
 
@@ -242,6 +255,7 @@ extension MovieDetailsViewController {
             from: viewModel.backdropImageURL,
             placeholder: UIImage(named: "BackdropPlaceholder")
         )
+
         titleLabel.text = viewModel.title
         subtitleLabel.text = viewModel.subtitle
         overviewLabel.text = viewModel.overview
@@ -251,7 +265,6 @@ extension MovieDetailsViewController {
 }
 
 // MARK: MovieDetailsViewModelDelegate Methods
-
 extension MovieDetailsViewController: MovieDetailsViewModelDelegate, Loadable, Alertable {
     func showLoading() {
         DispatchQueue.main.async { [weak self] in

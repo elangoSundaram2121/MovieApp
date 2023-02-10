@@ -10,6 +10,8 @@ import UIKit
 
 class MoviesCell: UITableViewCell {
     
+    // MARK: - Properties
+    
     private let movieImage: CachedImageView = {
         let imageView = CachedImageView()
         imageView.contentMode = .scaleAspectFit
@@ -72,9 +74,7 @@ class MoviesCell: UITableViewCell {
     
     private func configureConstraints() {
         
-        // A movie poster has 3:2 dimension, so aspect ratio is 1.5
         let aspectRatio: CGFloat = 3 / 2
-        
         let heightImageSize: CGFloat = 120
         let widthImageSize: CGFloat = heightImageSize / aspectRatio
         let padding: CGFloat = 12

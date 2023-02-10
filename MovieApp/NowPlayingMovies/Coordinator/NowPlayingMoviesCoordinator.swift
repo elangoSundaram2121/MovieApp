@@ -28,7 +28,6 @@ class NowPlayingMoviesCoordinator: NowPlayingMoviesCoordinatorType {
     // MARK: - Helpers
     var rootViewController: UIViewController {
         navigationController.tabBarItem = UITabBarItem(title: "Now Playing", image: UIImage(systemName: "play"), selectedImage: UIImage(systemName: "play.fill"))
-        navigationController.navigationBar.prefersLargeTitles = true
         return navigationController
     }
 

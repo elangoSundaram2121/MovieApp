@@ -18,56 +18,56 @@ protocol PopularMoviesViewModelDelegate: AnyObject {
 
 class PopularMoviesViewModel {
     // MARK: Properties
-
+    
     private let service: PopularMoviesServiceProtocol
-
+    
     private var movies: [Movie] = []
     private var currentPage: Int = 1
     private var isLoading = false
-
+    
     weak var delegate: PopularMoviesViewModelDelegate?
     weak var coordinator: PopularMoviesCoordinatorType?
-
+    
     // MARK: Initialization
-
+    
     init(
         service: PopularMoviesServiceProtocol = PopularMoviesService()
     ) {
         self.service = service
     }
-
+    
     // MARK: Methods
-
+    
     func getMovie(at indexPath: IndexPath) -> Movie {
         return movies[indexPath.row]
     }
-
+    
     func numberOfRows() -> Int {
         return movies.count
     }
-
+    
     func didSelectItem(at indexPath: IndexPath) {
         let movie = getMovie(at: indexPath)
         coordinator?.goToMovieDetails(with: movie)
     }
-
+    
     // To-do
     func setNavigationTitle() {
         delegate?.setNavigationTitle(to: "Popular")
     }
-
+    
     func loadPopularMovies() {
         delegate?.showLoading()
         getPopularMovies()
     }
-
+    
     func userRequestedMoreData() {
         if !isLoading {
             delegate?.showPaginationLoading()
             getPopularMovies()
         }
     }
-
+    
     private func getPopularMovies() {
         isLoading = true
         service.getPopularMovies(page: currentPage) { [weak self] result in

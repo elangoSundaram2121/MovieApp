@@ -13,6 +13,7 @@ protocol NowPlayingMoviesViewModelDelegate: AnyObject {
     func hideLoading()
     func reloadData()
     func reloadSearchData()
+    func showNoResultsState()
     func didFail(with error: ErrorHandler)
     func setNavigationTitle(to value: String)
 }
@@ -43,7 +44,6 @@ class NowPlayingMoviesViewModel {
     }
 
     // MARK: Methods
-
     func getMovie(at indexPath: IndexPath) -> Movie {
         return movies[indexPath.row]
     }
@@ -65,12 +65,7 @@ class NowPlayingMoviesViewModel {
         coordinator?.goToFavouriteMovies()
     }
 
-    // To-Do
-    func setNavigationTitle() {
-       
-    }
-
-    func loadTopRatedMovies() {
+    func loadNowPlayingMovies() {
         delegate?.showLoading()
         getNowPlayingMovies()
     }
@@ -103,16 +98,20 @@ class NowPlayingMoviesViewModel {
     func searchMovies(with query: String) {
 
         searchService.searchMovie(query: query, page: currentPage) { [weak self] result in
-                switch result {
-                case .success(let movies):
-                    self?.searchResults = movies.results
+            switch result {
+            case .success(let movies):
+                self?.searchResults = movies.results
+                let noResults = movies.results.isEmpty
+                if noResults {
+                    self?.delegate?.showNoResultsState()
+                } else {
                     self?.delegate?.reloadSearchData()
-
-                case .failure(let error):
-                    self?.delegate?.didFail(with: error)
                 }
-                self?.delegate?.hideLoading()
+            case .failure(let error):
+                self?.delegate?.didFail(with: error)
             }
+            self?.delegate?.hideLoading()
+        }
 
     }
 

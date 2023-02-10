@@ -17,6 +17,11 @@ class NowPlayingMoviesViewController: UIViewController {
     var filteredMovies: [Movie] = []
     var inSearchMode = false
     var searchTask: DispatchWorkItem?
+
+    var nowPlayingTableViewEnabled = true
+    var searchTableViewEnabled = false
+
+    // TableView to display NowPlaying movies
     private let nowPlayingTableView: UITableView = {
         let tableView = UITableView()
         tableView.register(
@@ -28,6 +33,7 @@ class NowPlayingMoviesViewController: UIViewController {
         return tableView
     }()
 
+    // TableView to display Search results
     private let searchTableView: UITableView = {
         let tableView = UITableView()
         tableView.register(
@@ -39,10 +45,19 @@ class NowPlayingMoviesViewController: UIViewController {
         return tableView
     }()
 
+    private let emptyStateView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
 
-
-    var nowPlayingTableViewEnabled = true
-    var searchTableViewEnabled = false
+    private let emptyStateLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 20)
+        label.text = "No Results Found"
+        return label
+    }()
     
     // MARK: Initialization
     
@@ -64,7 +79,6 @@ class NowPlayingMoviesViewController: UIViewController {
         configureViews()
         configureConstraints()
         configureDelegates()
-        configureTitle()
         loadData()
     }
     
@@ -74,6 +88,9 @@ class NowPlayingMoviesViewController: UIViewController {
         view.addSubview(nowPlayingTableView)
         view.addSubview(searchTableView)
         searchTableView.isHidden = true
+        view.addSubview(emptyStateView)
+        emptyStateView.addSubview(emptyStateLabel)
+        emptyStateView.isHidden = true
     }
 
     func configureSearchBar() {
@@ -89,14 +106,17 @@ class NowPlayingMoviesViewController: UIViewController {
             nowPlayingTableView.topAnchor.constraint(equalTo: view.topAnchor),
             nowPlayingTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             nowPlayingTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            nowPlayingTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
+            nowPlayingTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 
-        NSLayoutConstraint.activate([
             searchTableView.topAnchor.constraint(equalTo: view.topAnchor),
             searchTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             searchTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            searchTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            searchTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+
+            emptyStateView.centerXAnchor.constraint(equalTo: searchTableView.centerXAnchor),
+            emptyStateView.centerYAnchor.constraint(equalTo: searchTableView.centerYAnchor),
+            emptyStateLabel.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
+            emptyStateLabel.topAnchor.constraint(equalTo: emptyStateView.bottomAnchor, constant: 12)
         ])
     }
     
@@ -108,48 +128,44 @@ class NowPlayingMoviesViewController: UIViewController {
         viewModel.delegate = self
     }
     
-    private func configureTitle() {
-        viewModel.setNavigationTitle()
-    }
-    
-    // MARK: Data Manipulation Methods
+    // MARK: - Data Manipulation Methods
     
     private func loadData() {
-        viewModel.loadTopRatedMovies()
+        viewModel.loadNowPlayingMovies()
     }
 
 }
 
+// MARK: - UISearchBarDelegate Methods
 extension NowPlayingMoviesViewController: UISearchBarDelegate {
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         searchBar.showsCancelButton = true
         nowPlayingTableView.isHidden = true
         nowPlayingTableViewEnabled = false
 
-
-    }
-
-
-
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-
         searchTableView.isHidden = false
         searchTableViewEnabled = true
         searchTableView.separatorColor = .lightGray
+    }
 
-        if searchText.isEmpty || searchText == " " {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+
+
+
+        if searchText.isEmpty || searchText == "" {
             inSearchMode = false
-            searchTableView.reloadData()
+            emptyStateView.isHidden = true
+            searchTableView.isHidden = true
         } else {
             inSearchMode = true
+            searchTableView.isHidden = false
             self.searchTask?.cancel()
-
             let task = DispatchWorkItem { [weak self] in
                 self?.searchMovies(text: searchText)
             }
             self.searchTask = task
 
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.75, execute: task)
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5, execute: task)
         }
     }
 
@@ -170,21 +186,17 @@ extension NowPlayingMoviesViewController: UISearchBarDelegate {
         searchBar.text = nil
         inSearchMode = false
 
+        emptyStateView.isHidden = true
+
         searchTableViewEnabled = false
         searchTableView.isHidden = true
         nowPlayingTableViewEnabled = true
         nowPlayingTableView.isHidden = false
         searchTableView.separatorColor = .clear
-        searchTableView.reloadData()
-    }
-
-    @objc func searchMovies(searchText: String){
-
     }
 }
 
 // MARK: UITableViewDelegate/DataSource Methods
-
 extension NowPlayingMoviesViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == searchTableView {
@@ -220,9 +232,6 @@ extension NowPlayingMoviesViewController: UITableViewDelegate, UITableViewDataSo
 
             return cell
         }
-
-
-
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -288,6 +297,14 @@ extension NowPlayingMoviesViewController: NowPlayingMoviesViewModelDelegate, Loa
             )
         }
     }
+
+    func showNoResultsState() {
+        DispatchQueue.main.async { [weak self] in
+            self?.searchTableView.isHidden = true
+            self?.emptyStateView.isHidden = false
+            self?.emptyStateLabel.text = "No results found"
+        }
+    }
     
     func setNavigationTitle(to value: String) {
         self.title = value
@@ -295,7 +312,6 @@ extension NowPlayingMoviesViewController: NowPlayingMoviesViewModelDelegate, Loa
 }
 
 // MARK: TableViewFooter Private Extension Methods
-
 private extension NowPlayingMoviesViewController {
     private func createFooterSpinner(on tableView: UITableView) -> UIActivityIndicatorView {
         let spinner = UIActivityIndicatorView(style: .medium)

@@ -26,11 +26,11 @@ enum ErrorHandler: Error {
         case .invalidURL:
             return "You are trying to fetch a invalid URL."
         case .invalidData:
-            return "You get a invalid response from the server, bro!"
+            return "You get a invalid response from the server"
         case .noResponse:
-            return "No internet! The API doesn't give me a response."
+            return "We're having trouble loading this content, \n  please try again."
         case .badRequest:
-            return "Bad request! You provided wrong information to the server."
+            return "Bad request! Request is Invalid"
         case .unauthorized:
             return "401: No authorization! Please check if you have a valid API secret key."
         case .notFound:
@@ -38,7 +38,7 @@ enum ErrorHandler: Error {
         case .serverError:
             return "500:  Internal [RIP] Server Error"
         case .unexpectedStatusCode:
-            return "Oh god! I don't recognize this status code. Please, contact the backend guy."
+            return "We're having trouble loading this content, \n  please try again."
         default:
             return "Unknown error"
         }

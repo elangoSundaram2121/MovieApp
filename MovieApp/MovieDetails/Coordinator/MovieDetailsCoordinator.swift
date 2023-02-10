@@ -42,7 +42,7 @@ final class MovieDetailsCoordinator: MovieDetailsCoordinatorType {
         navigationController.dismiss(animated: true)
         finish()
     }
-
+    
     func goToFavourites() {
         self.dismissMovieDetails()
         let favouritesMovieCoordinator = FavouriteMoviesCoordinator(navigationController: navigationController)

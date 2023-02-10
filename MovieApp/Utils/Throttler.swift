@@ -8,6 +8,11 @@
 import Foundation
 import UIKit
 
+
+/**
+ Throttler Class which helps for the searching tasks whenever a user types fast to
+ make sure that, backend server doesn’t receive multiple requests
+ */
 class Throttler {
     private var searchTask: DispatchWorkItem?
 
@@ -20,10 +25,6 @@ class Throttler {
             guard let obj = self else {
                 return
             }
-            //  obj.getSearchProducts(searchText: searchText) { (products) in
-            //     block(products)
-            //  }
-            // here you hit the request and get back the data
         }
         self.searchTask = task
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5, execute: task)

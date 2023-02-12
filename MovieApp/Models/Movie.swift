@@ -7,7 +7,10 @@
 
 import Foundation
 
-struct Movie: Decodable {
+struct Movie: Decodable, Hashable {
+
+    let uuid = UUID()
+
     let id: Int
     let title: String
     let genres: [MovieGenre]?
@@ -34,7 +37,15 @@ struct Movie: Decodable {
 }
 
 extension Movie: Equatable {
-    static func == (lhs: Movie, rhs: Movie) -> Bool {
-        return true
+
+
+
+    static func ==(lhs: Movie, rhs: Movie) -> Bool {
+        return lhs.uuid == rhs.uuid
     }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(uuid)
+    }
+
 }

@@ -13,9 +13,28 @@ class UpcomingMoviesViewController: UIViewController {
     
     private let viewModel: UpcomingMoviesViewModel
 
+    var movies: [Movie] = []
+
     private let tableView: UITableView = {
         let tableView = UITableView()
         return tableView
+    }()
+
+    private lazy var upcomingTableViewDataSource: UITableViewDiffableDataSource<MovieSection, Movie> = {
+
+        let dataSource = UITableViewDiffableDataSource<MovieSection, Movie>(tableView: tableView) {
+            tableview, indexpath, movie in
+            guard let cell = tableview.dequeueReusableCell(withIdentifier: String(describing: MoviesCell.self)) as?
+                    MoviesCell else {
+                return UITableViewCell()
+            }
+            let cellViewModel = MoviesCellViewModel(movie: movie)
+            cell.setup(with: cellViewModel)
+            cell.selectionStyle = .none
+            return cell
+        }
+        return dataSource
+
     }()
     
     // MARK: Initialization
@@ -43,6 +62,14 @@ class UpcomingMoviesViewController: UIViewController {
     
     // MARK: Configuration/Setup
 
+    func configureMovieSnapShot() {
+        var snapshot = NSDiffableDataSourceSnapshot<MovieSection, Movie>()
+        snapshot.appendSections([.movie])
+        snapshot.appendItems(movies, toSection: .movie)
+
+        upcomingTableViewDataSource.apply(snapshot)
+    }
+
     private func configureTableView() {
         tableView.register(
             MoviesCell.self,
@@ -67,7 +94,6 @@ class UpcomingMoviesViewController: UIViewController {
     
     private func configureDelegates() {
         tableView.delegate = self
-        tableView.dataSource = self
         viewModel.delegate = self
     }
     
@@ -83,28 +109,8 @@ class UpcomingMoviesViewController: UIViewController {
 }
 
 // MARK: UITableViewDelegate/DataSource Methods
+extension UpcomingMoviesViewController: UITableViewDelegate {
 
-extension UpcomingMoviesViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.numberOfRows()
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: String(describing: MoviesCell.self),
-            for: indexPath
-        ) as? MoviesCell
-        else { return UITableViewCell() }
-        
-        let movie = viewModel.getMovie(at: indexPath)
-        let movieCellViewModel = MoviesCellViewModel(movie: movie)
-        
-        cell.selectionStyle = .none
-        cell.setup(with: movieCellViewModel)
-        
-        return cell
-    }
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.didSelectRow(at: indexPath)
     }
@@ -143,9 +149,10 @@ extension UpcomingMoviesViewController: UpcomingMoviesViewModelDelegate, Loadabl
         }
     }
     
-    func reloadData() {
+    func reloadData(movies: [Movie]) {
+        self.movies = movies
         DispatchQueue.main.async { [weak self] in
-            self?.tableView.reloadData()
+            self?.configureMovieSnapShot()
         }
     }
     

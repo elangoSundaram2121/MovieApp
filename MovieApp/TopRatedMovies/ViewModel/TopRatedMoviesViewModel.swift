@@ -11,7 +11,7 @@ protocol TopRatedMoviesViewModelDelegate: AnyObject {
     func showPaginationLoading()
     func showLoading()
     func hideLoading()
-    func reloadData()
+    func reloadData(movies: [Movie])
     func didFail(with error: ErrorHandler)
     func setNavigationTitle(to value: String)
 }
@@ -77,7 +77,9 @@ class TopRatedMoviesViewModel {
             case .success(let topRatedMovies):
                 self?.movies.append(contentsOf: topRatedMovies.results)
                 self?.currentPage = topRatedMovies.page + 1
-                self?.delegate?.reloadData()
+                if let topRatedMovies = self?.movies {
+                    self?.delegate?.reloadData(movies: topRatedMovies)
+                }
             case .failure(let error):
                 self?.delegate?.didFail(with: error)
             }

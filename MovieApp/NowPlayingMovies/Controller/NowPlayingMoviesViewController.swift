@@ -14,7 +14,8 @@ class NowPlayingMoviesViewController: UIViewController {
     private let viewModel: NowPlayingMoviesViewModel
 
     var searchBar = UISearchBar()
-    var filteredMovies: [Movie] = []
+    var movies: [Movie] = []
+    var searchResultsMovies: [Movie] = []
     var inSearchMode = false
     var searchTask: DispatchWorkItem?
 
@@ -44,6 +45,40 @@ class NowPlayingMoviesViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
+
+    private lazy var nowPlayingTableViewDataSource: UITableViewDiffableDataSource<MovieSection, Movie> = {
+
+        let dataSource = UITableViewDiffableDataSource<MovieSection, Movie>(tableView: nowPlayingTableView) {
+            tableview, indexpath, movie in
+            guard let cell = tableview.dequeueReusableCell(withIdentifier: String(describing: MoviesCell.self)) as?
+                    MoviesCell else {
+                return UITableViewCell()
+            }
+            let cellViewModel = MoviesCellViewModel(movie: movie)
+            cell.setup(with: cellViewModel)
+            cell.selectionStyle = .none
+            return cell
+        }
+        return dataSource
+
+    } ()
+
+    private lazy var searchTableViewDataSource: UITableViewDiffableDataSource<MovieSection, Movie> = {
+
+        let dataSource = UITableViewDiffableDataSource<MovieSection, Movie>(tableView: searchTableView) {
+            tableview, indexpath, movie in
+            guard let cell = tableview.dequeueReusableCell(withIdentifier: String(describing: MoviesCell.self)) as?
+                    MoviesCell else {
+                return UITableViewCell()
+            }
+            let cellViewModel = MoviesCellViewModel(movie: movie)
+            cell.setup(with: cellViewModel)
+            cell.selectionStyle = .none
+            return cell
+        }
+        return dataSource
+
+    } ()
 
     private let emptyStateView: UIView = {
         let view = UIView()
@@ -80,10 +115,31 @@ class NowPlayingMoviesViewController: UIViewController {
         configureConstraints()
         configureDelegates()
         loadData()
+        configureMovieSnapShot()
+        configureSearchResultsSnapShot()
+    }
+
+    func configureMovieSnapShot() {
+        var snapshot = NSDiffableDataSourceSnapshot<MovieSection, Movie>()
+        snapshot.appendSections([.movie])
+        snapshot.appendItems(movies, toSection: .movie)
+
+        nowPlayingTableViewDataSource.apply(snapshot)
+    }
+
+    func configureSearchResultsSnapShot() {
+        var snapshot = NSDiffableDataSourceSnapshot<MovieSection, Movie>()
+        snapshot.appendSections([.movie])
+        snapshot.appendItems(searchResultsMovies, toSection: .movie)
+
+        UIView.performWithoutAnimation {
+            searchTableViewDataSource.apply(snapshot)
+        }
+
     }
     
     // MARK: Configuration/Setup
-    
+
     private func configureViews() {
         view.addSubview(nowPlayingTableView)
         view.addSubview(searchTableView)
@@ -122,9 +178,7 @@ class NowPlayingMoviesViewController: UIViewController {
     
     private func configureDelegates() {
         nowPlayingTableView.delegate = self
-        nowPlayingTableView.dataSource = self
         searchTableView.delegate = self
-        searchTableView.dataSource = self
         viewModel.delegate = self
     }
     
@@ -196,42 +250,7 @@ extension NowPlayingMoviesViewController: UISearchBarDelegate {
 }
 
 // MARK: UITableViewDelegate/DataSource Methods
-extension NowPlayingMoviesViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if tableView == searchTableView {
-            return viewModel.numberOfRows()
-        } else {
-            return viewModel.numberOfRows()
-        }
-
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: String(describing: MoviesCell.self),
-                for: indexPath
-            ) as? MoviesCell
-            else { return UITableViewCell() }
-
-        if tableView == searchTableView {
-            let movie = viewModel.getSearchResultsMovie(at: indexPath)
-            let movieCellViewModel = MoviesCellViewModel(movie: movie)
-
-            cell.selectionStyle = .none
-            cell.setup(with: movieCellViewModel)
-
-            return cell
-        } else {
-            let movie = viewModel.getMovie(at: indexPath)
-            let movieCellViewModel = MoviesCellViewModel(movie: movie)
-
-            cell.selectionStyle = .none
-            cell.setup(with: movieCellViewModel)
-
-            return cell
-        }
-    }
+extension NowPlayingMoviesViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
@@ -244,9 +263,7 @@ extension NowPlayingMoviesViewController: UITableViewDelegate, UITableViewDataSo
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if tableView == searchTableView {
-
-        } else {
+        if tableView == nowPlayingTableView {
             let lastSection = tableView.numberOfSections - 1
             let lastRow = tableView.numberOfRows(inSection: lastSection) - 1
             if indexPath.section == lastSection && indexPath.row == lastRow {
@@ -259,6 +276,7 @@ extension NowPlayingMoviesViewController: UITableViewDelegate, UITableViewDataSo
 // MARK: NowPlayingMoviesViewModelDelegate Methods
 
 extension NowPlayingMoviesViewController: NowPlayingMoviesViewModelDelegate, Loadable, Alertable {
+
     func showLoading() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -281,15 +299,17 @@ extension NowPlayingMoviesViewController: NowPlayingMoviesViewModelDelegate, Loa
         }
     }
     
-    func reloadData() {
-        DispatchQueue.main.async { [weak self] in
-            self?.nowPlayingTableView.reloadData()
+    func reloadData(movies: [Movie]) {
+        self.movies = movies
+        DispatchQueue.main.async {
+            self.configureMovieSnapShot()
         }
     }
 
-    func reloadSearchData() {
-        DispatchQueue.main.async { [weak self] in
-            self?.searchTableView.reloadData()
+    func reloadSearchData(searchMovies: [Movie]) {
+        self.searchResultsMovies = searchMovies
+        DispatchQueue.main.async {
+            self.configureSearchResultsSnapShot()
         }
     }
     

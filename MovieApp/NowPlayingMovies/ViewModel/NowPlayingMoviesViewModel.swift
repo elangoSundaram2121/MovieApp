@@ -11,8 +11,8 @@ protocol NowPlayingMoviesViewModelDelegate: AnyObject {
     func showPaginationLoading()
     func showLoading()
     func hideLoading()
-    func reloadData()
-    func reloadSearchData()
+    func reloadData(movies: [Movie])
+    func reloadSearchData(searchMovies: [Movie])
     func showNoResultsState()
     func didFail(with error: ErrorHandler)
     func setNavigationTitle(to value: String)
@@ -89,7 +89,10 @@ class NowPlayingMoviesViewModel {
             case .success(let nowPlayingMovies):
                 self?.movies.append(contentsOf: nowPlayingMovies.results)
                 self?.currentPage = nowPlayingMovies.page + 1
-                self?.delegate?.reloadData()
+                if let movies = self?.movies {
+                    self?.delegate?.reloadData(movies: movies)
+                }
+
             case .failure(let error):
                 self?.delegate?.didFail(with: error)
             }
@@ -108,7 +111,9 @@ class NowPlayingMoviesViewModel {
                 if noResults {
                     self?.delegate?.showNoResultsState()
                 } else {
-                    self?.delegate?.reloadSearchData()
+                    if let searchMovies = self?.searchResults {
+                        self?.delegate?.reloadSearchData(searchMovies: searchMovies)
+                    }
                 }
             case .failure(let error):
                 self?.delegate?.didFail(with: error)

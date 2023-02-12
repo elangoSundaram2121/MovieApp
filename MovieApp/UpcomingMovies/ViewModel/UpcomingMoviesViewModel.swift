@@ -11,7 +11,7 @@ protocol UpcomingMoviesViewModelDelegate: AnyObject {
     func showPaginationLoading()
     func showLoading()
     func hideLoading()
-    func reloadData()
+    func reloadData(movies: [Movie])
     func didFail(with error: ErrorHandler)
     func setNavigationTitle(to value: String)
 }
@@ -75,7 +75,9 @@ class UpcomingMoviesViewModel {
             case .success(let upcomingMovies):
                 self?.movies.append(contentsOf: upcomingMovies.results)
                 self?.currentPage = upcomingMovies.page + 1
-                self?.delegate?.reloadData()
+                if let upcomingMovies = self?.movies {
+                    self?.delegate?.reloadData(movies: upcomingMovies)
+                }
             case .failure(let error):
                 self?.delegate?.didFail(with: error)
             }

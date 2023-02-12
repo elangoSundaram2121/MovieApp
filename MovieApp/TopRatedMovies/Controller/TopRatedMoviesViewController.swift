@@ -10,7 +10,10 @@ import UIKit
 class TopRatedMoviesViewController: UIViewController {
 
     // MARK: Properties
+    
     private let viewModel: TopRatedMoviesViewModel
+
+    var movies: [Movie] = []
 
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -21,6 +24,23 @@ class TopRatedMoviesViewController: UIViewController {
         tableView.showsVerticalScrollIndicator = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
+    }()
+
+    private lazy var topRatedTableViewDataSource: UITableViewDiffableDataSource<MovieSection, Movie> = {
+
+        let dataSource = UITableViewDiffableDataSource<MovieSection, Movie>(tableView: tableView) {
+            tableview, indexpath, movie in
+            guard let cell = tableview.dequeueReusableCell(withIdentifier: String(describing: MoviesCell.self)) as?
+                    MoviesCell else {
+                return UITableViewCell()
+            }
+            let cellViewModel = MoviesCellViewModel(movie: movie)
+            cell.setup(with: cellViewModel)
+            cell.selectionStyle = .none
+            return cell
+        }
+        return dataSource
+
     }()
 
     // MARK: Initialization
@@ -43,9 +63,19 @@ class TopRatedMoviesViewController: UIViewController {
         configureDelegates()
         configureTitle()
         loadData()
+        configureMovieSnapShot()
     }
 
     // MARK: Configuration/Setup
+
+    func configureMovieSnapShot() {
+        var snapshot = NSDiffableDataSourceSnapshot<MovieSection, Movie>()
+        snapshot.appendSections([.movie])
+        snapshot.appendItems(movies, toSection: .movie)
+
+        topRatedTableViewDataSource.apply(snapshot)
+    }
+
 
     private func configureViews() {
         view.addSubview(tableView)
@@ -62,7 +92,6 @@ class TopRatedMoviesViewController: UIViewController {
 
     private func configureDelegates() {
         tableView.delegate = self
-        tableView.dataSource = self
         viewModel.delegate = self
     }
 
@@ -79,26 +108,7 @@ class TopRatedMoviesViewController: UIViewController {
 
 // MARK: UITableViewDelegate/DataSource Methods
 
-extension TopRatedMoviesViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.numberOfRows()
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: String(describing: MoviesCell.self),
-            for: indexPath
-        ) as? MoviesCell
-        else { return UITableViewCell() }
-
-        let movie = viewModel.getMovie(at: indexPath)
-        let movieCellViewModel = MoviesCellViewModel(movie: movie)
-
-        cell.selectionStyle = .none
-        cell.setup(with: movieCellViewModel)
-
-        return cell
-    }
+extension TopRatedMoviesViewController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.didSelectRow(at: indexPath)
@@ -137,9 +147,10 @@ extension TopRatedMoviesViewController: TopRatedMoviesViewModelDelegate, Loadabl
         }
     }
 
-    func reloadData() {
+    func reloadData(movies: [Movie]) {
+        self.movies = movies
         DispatchQueue.main.async { [weak self] in
-            self?.tableView.reloadData()
+            self?.configureMovieSnapShot()
         }
     }
 

@@ -70,7 +70,10 @@ class NowPlayingMoviesViewModel {
         getNowPlayingMovies()
     }
 
-    
+    func didSelectSearchRow(at indexPath: IndexPath) {
+        let movie = getSearchResultsMovie(at: indexPath)
+        coordinator?.goToMovieDetails(with: movie)
+    }
 
     func userRequestedMoreData() {
         if !isLoading {

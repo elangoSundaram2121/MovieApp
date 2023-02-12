@@ -150,14 +150,13 @@ extension NowPlayingMoviesViewController: UISearchBarDelegate {
 
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 
-
-
         if searchText.isEmpty || searchText == "" {
             inSearchMode = false
             emptyStateView.isHidden = true
             searchTableView.isHidden = true
         } else {
             inSearchMode = true
+            emptyStateView.isHidden = true
             searchTableView.isHidden = false
             self.searchTask?.cancel()
             let task = DispatchWorkItem { [weak self] in
@@ -235,7 +234,13 @@ extension NowPlayingMoviesViewController: UITableViewDelegate, UITableViewDataSo
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.didSelectRow(at: indexPath)
+
+        if tableView == searchTableView {
+            viewModel.didSelectSearchRow(at: indexPath)
+        } else {
+            viewModel.didSelectRow(at: indexPath)
+        }
+
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
